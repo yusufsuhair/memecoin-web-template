@@ -25,6 +25,7 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [highScore, setHighScore] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const playerRef = useRef({ x: 400, y: 500, width: 60, height: 60, speed: 5 });
   const coinsRef = useRef<Coin[]>([]);
@@ -230,6 +231,17 @@ const Game = () => {
   }, [isPlaying, gameOver, gameLoop]);
 
   useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) || window.innerWidth <= 768;
+      setIsMobile(isMobileDevice);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
         keysRef.current.left = true;
@@ -254,8 +266,17 @@ const Game = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("resize", checkMobile);
     };
   }, []);
+
+  const handleTouchStart = (direction: "left" | "right") => {
+    keysRef.current[direction] = true;
+  };
+
+  const handleTouchEnd = (direction: "left" | "right") => {
+    keysRef.current[direction] = false;
+  };
 
   return (
     <section id="game" className="relative w-full min-h-screen bg-black flex items-center justify-center py-20">
@@ -346,8 +367,52 @@ const Game = () => {
 
           {/* Instructions */}
           <div className="mt-4 text-center text-white/60 text-sm">
-            <p>← → Arrow Keys or A/D to move</p>
+            {isMobile ? (
+              <p>Tap the buttons below to move</p>
+            ) : (
+              <p>← → Arrow Keys or A/D to move</p>
+            )}
           </div>
+
+          {/* Mobile Touch Controls */}
+          {isMobile && isPlaying && !gameOver && (
+            <div className="mt-6 flex justify-center gap-8">
+              <button
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleTouchStart("left");
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleTouchEnd("left");
+                }}
+                onMouseDown={() => handleTouchStart("left")}
+                onMouseUp={() => handleTouchEnd("left")}
+                onMouseLeave={() => handleTouchEnd("left")}
+                className="w-20 h-20 rounded-full bg-[#00ff88]/20 border-2 border-[#00ff88] flex items-center justify-center text-[#00ff88] text-2xl font-bold active:bg-[#00ff88]/40 active:scale-95 transition-all touch-none select-none"
+                aria-label="Move Left"
+              >
+                ←
+              </button>
+              <button
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleTouchStart("right");
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleTouchEnd("right");
+                }}
+                onMouseDown={() => handleTouchStart("right")}
+                onMouseUp={() => handleTouchEnd("right")}
+                onMouseLeave={() => handleTouchEnd("right")}
+                className="w-20 h-20 rounded-full bg-[#00ff88]/20 border-2 border-[#00ff88] flex items-center justify-center text-[#00ff88] text-2xl font-bold active:bg-[#00ff88]/40 active:scale-95 transition-all touch-none select-none"
+                aria-label="Move Right"
+              >
+                →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
