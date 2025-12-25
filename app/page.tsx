@@ -1,6 +1,6 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Marquee from "./components/Marquee";
+import Game from "./components/Game";
 import About from "./components/About";
 import Tokenomics from "./components/Tokenomics";
 import Roadmap from "./components/Roadmap";
@@ -13,7 +13,7 @@ export default function Home() {
       <Toaster position="top-center" theme="dark" />
       <Navbar />
       <Hero />
-      <Marquee />
+      <Game />
       <About />
       <Tokenomics />
       <Roadmap />
