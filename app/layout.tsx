@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bangers, Inter } from "next/font/google";
 import "./globals.css";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import WalletContextProvider from "./components/WalletProvider";
 
 const bangers = Bangers({
   weight: "400",
@@ -28,7 +30,9 @@ export default function RootLayout({
       <body
         className={`${bangers.variable} ${inter.variable} antialiased bg-black text-white`}
       >
-        {children}
+        <WalletContextProvider>
+          {children}
+        </WalletContextProvider>
       </body>
     </html>
   );

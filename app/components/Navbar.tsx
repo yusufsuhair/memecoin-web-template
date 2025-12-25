@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import WalletButton from "./WalletButton";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -47,7 +48,7 @@ const Navbar = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -57,6 +58,7 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
+            <WalletButton />
             <motion.a
               href="https://raydium.io/swap"
               target="_blank"
@@ -96,6 +98,9 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
+            <div className="flex justify-center">
+              <WalletButton />
+            </div>
             <a
               href="https://raydium.io/swap"
               target="_blank"
