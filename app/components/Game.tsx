@@ -25,15 +25,15 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
 
   const playerRef = useRef({ x: 400, y: 500, width: 60, height: 60, speed: 5 });
   const coinsRef = useRef<Coin[]>([]);
   const obstaclesRef = useRef<Obstacle[]>([]);
-  const keysRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false });
+  const mouseXRef = useRef<number | null>(null);
   const gameSpeedRef = useRef(2);
   const coinSpawnTimerRef = useRef(0);
   const obstacleSpawnTimerRef = useRef(0);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
 
   const initGame = useCallback(() => {
     playerRef.current = { x: 400, y: 500, width: 60, height: 60, speed: 5 };
@@ -85,12 +85,21 @@ const Game = () => {
       ctx.fillRect(x, y, 2, 2);
     }
 
-    // Handle player movement
-    if (keysRef.current.left && player.x > 0) {
-      player.x -= player.speed;
-    }
-    if (keysRef.current.right && player.x < canvas.width - player.width) {
-      player.x += player.speed;
+    // Handle player movement - follow mouse/touch position
+    if (mouseXRef.current !== null) {
+      const targetX = mouseXRef.current;
+      const currentX = player.x + player.width / 2;
+      const diff = targetX - currentX;
+      
+      // Smooth movement with easing
+      if (Math.abs(diff) > 2) {
+        player.x += diff * 0.15; // Smooth interpolation
+        // Clamp to canvas bounds
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      } else {
+        player.x = targetX - player.width / 2;
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      }
     }
 
     // Spawn coins
@@ -231,52 +240,52 @@ const Game = () => {
   }, [isPlaying, gameOver, gameLoop]);
 
   useEffect(() => {
-    // Detect mobile device
-    const checkMobile = () => {
-      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      ) || window.innerWidth <= 768;
-      setIsMobile(isMobileDevice);
-    };
-    
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+    const canvas = canvasRef.current;
+    const container = canvasContainerRef.current;
+    if (!canvas || !container) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-        keysRef.current.left = true;
-      }
-      if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-        keysRef.current.right = true;
+    const getMouseX = (clientX: number) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      return (clientX - rect.left) * scaleX;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isPlaying && !gameOver) {
+        mouseXRef.current = getMouseX(e.clientX);
       }
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-        keysRef.current.left = false;
-      }
-      if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-        keysRef.current.right = false;
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isPlaying && !gameOver && e.touches.length > 0) {
+        e.preventDefault(); // Prevent scrolling
+        mouseXRef.current = getMouseX(e.touches[0].clientX);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    const handleMouseLeave = () => {
+      // Keep last position when mouse leaves (don't reset)
+    };
+
+    const handleTouchEnd = () => {
+      // Keep last position when touch ends (don't reset)
+    };
+
+    // Add event listeners to canvas container
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("mouseleave", handleMouseLeave);
+    container.addEventListener("touchend", handleTouchEnd);
+    container.addEventListener("touchcancel", handleTouchEnd);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("resize", checkMobile);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, []);
-
-  const handleTouchStart = (direction: "left" | "right") => {
-    keysRef.current[direction] = true;
-  };
-
-  const handleTouchEnd = (direction: "left" | "right") => {
-    keysRef.current[direction] = false;
-  };
+  }, [isPlaying, gameOver]);
 
   return (
     <section id="game" className="relative w-full min-h-screen bg-black flex items-center justify-center py-20">
@@ -292,7 +301,7 @@ const Game = () => {
             Collect The Coins!
           </h2>
           <p className="text-white/70 text-lg mb-6">
-            Use Arrow Keys or A/D to move. Collect coins and avoid obstacles!
+            Move your mouse or drag your finger to control the rocket. Collect coins and avoid obstacles!
           </p>
         </motion.div>
 
@@ -312,13 +321,17 @@ const Game = () => {
           </div>
 
           {/* Game Canvas */}
-          <div className="relative">
+          <div 
+            ref={canvasContainerRef}
+            className="relative cursor-pointer touch-none"
+            style={{ userSelect: "none", WebkitUserSelect: "none" }}
+          >
             <canvas
               ref={canvasRef}
               width={800}
               height={600}
               className="w-full h-auto border-2 border-[#00ff88]/50 rounded-lg bg-black"
-              style={{ maxWidth: "100%", height: "auto" }}
+              style={{ maxWidth: "100%", height: "auto", touchAction: "none" }}
             />
 
             {/* Start Screen */}
@@ -367,52 +380,8 @@ const Game = () => {
 
           {/* Instructions */}
           <div className="mt-4 text-center text-white/60 text-sm">
-            {isMobile ? (
-              <p>Tap the buttons below to move</p>
-            ) : (
-              <p>← → Arrow Keys or A/D to move</p>
-            )}
+            <p>Move mouse or drag finger over the game area to control</p>
           </div>
-
-          {/* Mobile Touch Controls */}
-          {isMobile && isPlaying && !gameOver && (
-            <div className="mt-6 flex justify-center gap-8">
-              <button
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  handleTouchStart("left");
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  handleTouchEnd("left");
-                }}
-                onMouseDown={() => handleTouchStart("left")}
-                onMouseUp={() => handleTouchEnd("left")}
-                onMouseLeave={() => handleTouchEnd("left")}
-                className="w-20 h-20 rounded-full bg-[#00ff88]/20 border-2 border-[#00ff88] flex items-center justify-center text-[#00ff88] text-2xl font-bold active:bg-[#00ff88]/40 active:scale-95 transition-all touch-none select-none"
-                aria-label="Move Left"
-              >
-                ←
-              </button>
-              <button
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  handleTouchStart("right");
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  handleTouchEnd("right");
-                }}
-                onMouseDown={() => handleTouchStart("right")}
-                onMouseUp={() => handleTouchEnd("right")}
-                onMouseLeave={() => handleTouchEnd("right")}
-                className="w-20 h-20 rounded-full bg-[#00ff88]/20 border-2 border-[#00ff88] flex items-center justify-center text-[#00ff88] text-2xl font-bold active:bg-[#00ff88]/40 active:scale-95 transition-all touch-none select-none"
-                aria-label="Move Right"
-              >
-                →
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </section>
