@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Coins, Zap, Trophy, Volume2, VolumeX } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { toast } from "sonner";
+import Leaderboard from "./Leaderboard";
 
 interface Coin {
   x: number;
@@ -30,6 +33,7 @@ interface Particle {
 }
 
 const Game = () => {
+  const { publicKey, connected } = useWallet();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [score, setScore] = useState(0);
@@ -37,6 +41,7 @@ const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [highScore, setHighScore] = useState(0);
   const [muted, setMuted] = useState(false);
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
   const particlesRef = useRef<Particle[]>([]);
   const screenShakeRef = useRef(0);
   
@@ -61,7 +66,7 @@ const Game = () => {
     }
   }, []);
   
-  // Resume audio context on user interaction (required by browsers)
+  // Resume audio context on user interaction (required by browsers)  
   const resumeAudioContext = useCallback(async () => {
     if (audioContextRef.current && audioContextRef.current.state === "suspended") {
       try {
@@ -197,6 +202,39 @@ const Game = () => {
       }
     }, totalDuration);
   }, [muted, isPlaying, gameOver, resumeAudioContext, stopBackgroundMusic]);
+
+  const submitScoreToLeaderboard = useCallback(async (finalScore: number) => {
+    if (!connected || !publicKey || scoreSubmitted) return;
+
+    try {
+      const response = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          wallet_address: publicKey.toBase58(),
+          score: finalScore,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setScoreSubmitted(true);
+        toast.success("Score submitted to leaderboard! 🎉");
+      } else {
+        if (result.message?.includes("not higher")) {
+          toast.info("Your score wasn't higher than your previous best.");
+        } else {
+          toast.error("Failed to submit score. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting score:", error);
+      toast.error("Failed to submit score. Please try again.");
+    }
+  }, [connected, publicKey, scoreSubmitted]);
 
   const initGame = useCallback(async () => {
     playerRef.current = { x: 400, y: 500, width: 60, height: 60, speed: 5 };
@@ -432,8 +470,15 @@ const Game = () => {
         // Screen shake
         screenShakeRef.current = 20;
         
+        const currentScore = score;
         setGameOver(true);
         setIsPlaying(false);
+        
+        // Submit score if wallet is connected
+        setTimeout(() => {
+          submitScoreToLeaderboard(currentScore);
+        }, 0);
+        
         return false;
       }
 
@@ -567,8 +612,8 @@ const Game = () => {
       ctx.restore();
     }
 
-    animationFrameRef.current = requestAnimationFrame(gameLoop);
-  }, [isPlaying, gameOver, highScore, score, muted, playCoinSound, playGameOverSound, stopBackgroundMusic]);
+        animationFrameRef.current = requestAnimationFrame(gameLoop);
+      }, [isPlaying, gameOver, highScore, score, muted, playCoinSound, playGameOverSound, stopBackgroundMusic, submitScoreToLeaderboard]);
 
   useEffect(() => {
     if (isPlaying && !gameOver) {
@@ -641,7 +686,7 @@ const Game = () => {
 
   return (
     <section id="game" className="relative w-full min-h-screen bg-black flex items-center justify-center py-20">
-      <div className="max-w-4xl w-full px-4">
+      <div className="max-w-7xl w-full px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -657,7 +702,9 @@ const Game = () => {
           </p>
         </motion.div>
 
-        <div className="relative bg-black/50 backdrop-blur-sm border border-[#00ff88]/30 rounded-lg p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Game Container */}
+          <div className="flex-1 relative bg-black/50 backdrop-blur-sm border border-[#00ff88]/30 rounded-lg p-6">
           {/* Score Display */}
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2 text-[#00ff88]">
@@ -740,6 +787,14 @@ const Game = () => {
                   {score === highScore && score > 0 && (
                     <p className="text-[#00ff88] mb-4">🎉 New High Score! 🎉</p>
                   )}
+                  {!connected && (
+                    <p className="text-yellow-400 mb-4 text-sm">
+                      Connect your wallet to submit your score to the leaderboard!
+                    </p>
+                  )}
+                  {connected && scoreSubmitted && (
+                    <p className="text-[#00ff88] mb-4 text-sm">✅ Score submitted!</p>
+                  )}
                   <button
                     onClick={initGame}
                     className="px-8 py-3 bg-gradient-to-r from-[#00ff88] to-[#00d4ff] text-black font-bold rounded-lg hover:scale-105 transition-transform"
@@ -754,6 +809,12 @@ const Game = () => {
           {/* Instructions */}
           <div className="mt-4 text-center text-white/60 text-sm">
             <p>Move mouse or drag finger over the game area to control</p>
+          </div>
+        </div>
+
+          {/* Leaderboard Sidebar */}
+          <div className="lg:w-80 w-full">
+            <Leaderboard />
           </div>
         </div>
       </div>
