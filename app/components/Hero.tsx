@@ -21,34 +21,15 @@ const Hero = () => {
             The most memeable memecoin in existence. The dogs have had their day, it's time for UFO to take reign.
           </p>
 
-          {/* Social Links */}
-          <div className="flex justify-center lg:justify-start gap-6 flex-wrap">
+          {/* Token Address Link */}
+          <div className="flex justify-center lg:justify-start">
             <a
-              href="https://twitter.com"
+              href="https://pump.fun/[TOKEN_ADDRESS]"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:opacity-80 transition-opacity"
-              aria-label="Twitter"
+              className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:opacity-90 transition-opacity text-lg"
             >
-              <span className="text-white text-2xl sm:text-3xl">🐦</span>
-            </a>
-            <a
-              href="https://solscan.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:opacity-80 transition-opacity"
-              aria-label="Solscan"
-            >
-              <span className="text-white text-2xl sm:text-3xl">🔍</span>
-            </a>
-            <a
-              href="https://jup.ag"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:opacity-80 transition-opacity"
-              aria-label="Jupiter"
-            >
-              <span className="text-white text-2xl sm:text-3xl">🦄</span>
+              View on Pump.fun
             </a>
           </div>
         </div>
