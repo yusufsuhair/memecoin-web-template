@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Coins, Zap, Trophy, Volume2, VolumeX } from "lucide-react";
+import { Coins, Zap, Trophy, Volume2, VolumeX, Wallet } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { toast } from "sonner";
 import Leaderboard from "./Leaderboard";
 
@@ -34,6 +35,7 @@ interface Particle {
 
 const Game = () => {
   const { publicKey, connected } = useWallet();
+  const { setVisible } = useWalletModal();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const [score, setScore] = useState(0);
@@ -237,6 +239,13 @@ const Game = () => {
   }, [connected, publicKey, scoreSubmitted]);
 
   const initGame = useCallback(async () => {
+    // Require wallet connection to play
+    if (!connected || !publicKey) {
+      toast.error("Please connect your wallet to play!");
+      setVisible(true);
+      return;
+    }
+
     playerRef.current = { x: 400, y: 500, width: 60, height: 60, speed: 5 };
     coinsRef.current = [];
     obstaclesRef.current = [];
@@ -254,7 +263,7 @@ const Game = () => {
     setTimeout(() => {
       playBackgroundMusic();
     }, 200); // Small delay to ensure state is set
-  }, [muted, playBackgroundMusic, resumeAudioContext]);
+  }, [muted, playBackgroundMusic, resumeAudioContext, connected, publicKey, setVisible]);
   
   const createParticles = (x: number, y: number, color: string, count: number = 10) => {
     for (let i = 0; i < count; i++) {
@@ -762,14 +771,36 @@ const Game = () => {
                   animate={{ scale: 1, opacity: 1 }}
                   className="text-center"
                 >
-                  <Zap className="w-16 h-16 text-[#00ff88] mx-auto mb-4" />
-                  <h3 className="text-3xl font-bold text-white mb-4">Ready to Play?</h3>
-                  <button
-                    onClick={initGame}
-                    className="px-8 py-3 bg-gradient-to-r from-[#00ff88] to-[#00d4ff] text-black font-bold rounded-lg hover:scale-105 transition-transform"
-                  >
-                    Start Game
-                  </button>
+                  {!connected ? (
+                    <>
+                      <Wallet className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+                      <h3 className="text-3xl font-bold text-white mb-2">Wallet Required</h3>
+                      <p className="text-white/70 mb-6 max-w-md mx-auto">
+                        Connect your Solana wallet to play!
+                      </p>
+                      <button
+                        onClick={() => setVisible(true)}
+                        className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold rounded-lg hover:scale-105 transition-transform shadow-lg shadow-yellow-400/50"
+                      >
+                        <Wallet className="w-5 h-5 inline-block mr-2" />
+                        Connect Wallet
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-16 h-16 text-[#00ff88] mx-auto mb-4" />
+                      <h3 className="text-3xl font-bold text-white mb-4">Ready to Play?</h3>
+                      <p className="text-white/70 mb-4 text-sm">
+                        Connected: {publicKey?.toBase58().slice(0, 4)}...{publicKey?.toBase58().slice(-4)}
+                      </p>
+                      <button
+                        onClick={initGame}
+                        className="px-8 py-3 bg-gradient-to-r from-[#00ff88] to-[#00d4ff] text-black font-bold rounded-lg hover:scale-105 transition-transform"
+                      >
+                        Start Game
+                      </button>
+                    </>
+                  )}
                 </motion.div>
               </div>
             )}
@@ -818,6 +849,7 @@ const Game = () => {
           </div>
         </div>
       </div>
+
     </section>
   );
 };

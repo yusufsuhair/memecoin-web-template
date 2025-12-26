@@ -1,9 +1,9 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Game from "./components/Game";
 import About from "./components/About";
+import HowToBuy from "./components/HowToBuy";
+import Game from "./components/Game";
 import Tokenomics from "./components/Tokenomics";
-import Roadmap from "./components/Roadmap";
 import Footer from "./components/Footer";
 import { Toaster } from "sonner";
 
@@ -13,10 +13,10 @@ export default function Home() {
       <Toaster position="top-center" theme="dark" />
       <Navbar />
       <Hero />
-      <Game />
       <About />
+      <HowToBuy />
+      <Game />
       <Tokenomics />
-      <Roadmap />
       <Footer />
     </main>
   );

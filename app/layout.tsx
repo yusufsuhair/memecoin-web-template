@@ -16,8 +16,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "[INSERT COIN NAME HERE] - The Ultimate Memecoin",
-  description: "Join the revolution. The most degenerate memecoin on the blockchain.",
+  title: "$MEME - The Ultimate Memecoin",
+  description: "The most memeable memecoin in existence. The dogs have had their day, it's time for MEME to take reign.",
 };
 
 export default function RootLayout({
