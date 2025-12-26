@@ -8,17 +8,17 @@ const Hero = () => {
         <div className="text-center lg:text-left space-y-8 lg:space-y-12">
           {/* Logo/Title */}
           <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white">
-            MEME
+            UFO
           </div>
 
           {/* Main Headline */}
           <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10rem] font-bold text-white leading-none">
-            $MEME
+            $UFO
           </h1>
 
           {/* Tagline */}
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/90 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-            The most memeable memecoin in existence. The dogs have had their day, it's time for MEME to take reign.
+            The most memeable memecoin in existence. The dogs have had their day, it's time for UFO to take reign.
           </p>
 
           {/* Social Links */}
@@ -33,20 +33,20 @@ const Hero = () => {
               <span className="text-white text-2xl sm:text-3xl">🐦</span>
             </a>
             <a
-              href="https://etherscan.io"
+              href="https://solscan.io"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:opacity-80 transition-opacity"
-              aria-label="Etherscan"
+              aria-label="Solscan"
             >
               <span className="text-white text-2xl sm:text-3xl">🔍</span>
             </a>
             <a
-              href="https://uniswap.org"
+              href="https://jup.ag"
               target="_blank"
               rel="noopener noreferrer"
               className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center hover:opacity-80 transition-opacity"
-              aria-label="Uniswap"
+              aria-label="Jupiter"
             >
               <span className="text-white text-2xl sm:text-3xl">🦄</span>
             </a>

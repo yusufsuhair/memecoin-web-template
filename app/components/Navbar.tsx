@@ -22,7 +22,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="text-xl font-bold">
             <a href="#hero" className="text-white hover:text-white/80 transition-colors">
-              MEME
+              UFO
             </a>
           </div>
 

@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Logo Section */}
           <div className="text-center md:text-left">
             <div className="text-3xl font-bold text-white mb-4">
-              MEME
+              UFO
             </div>
             <p className="text-white/60 text-sm">
               The most memeable memecoin in existence.
@@ -57,20 +57,20 @@ const Footer = () => {
                 <span className="text-white text-2xl">🐦</span>
               </a>
               <a
-                href="https://etherscan.io"
+                href="https://solscan.io"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-opacity"
-                aria-label="Etherscan"
+                aria-label="Solscan"
               >
                 <span className="text-white text-2xl">🔍</span>
               </a>
               <a
-                href="https://uniswap.org"
+                href="https://jup.ag"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center hover:opacity-80 transition-opacity"
-                aria-label="Uniswap"
+                aria-label="Jupiter"
               >
                 <span className="text-white text-2xl">🦄</span>
               </a>
@@ -84,10 +84,10 @@ const Footer = () => {
         {/* Disclaimer */}
         <div className="space-y-4 text-xs text-white/50 max-w-4xl mx-auto text-center mb-8 leading-relaxed">
           <p>
-            $MEME coin has no association with any original creator. This token is simply paying homage to a meme we all love and recognize.
+            $UFO coin has no association with any original creator. This token is simply paying homage to a meme we all love and recognize.
           </p>
           <p>
-            $MEME is a meme coin with no intrinsic value or expectation of financial return. There is no formal team or roadmap. 
+            $UFO is a meme coin with no intrinsic value or expectation of financial return. There is no formal team or roadmap. 
             The coin is completely useless and for entertainment purposes only.
           </p>
         </div>
@@ -95,7 +95,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="text-center pt-4 border-t border-white/10">
           <p className="text-sm text-white/40">
-            © {new Date().getFullYear()} by MEME. All rights reserved.
+            © {new Date().getFullYear()} by UFO. All rights reserved.
           </p>
         </div>
       </div>

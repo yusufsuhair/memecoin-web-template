@@ -4,19 +4,19 @@ const HowToBuy = () => {
   const steps = [
     {
       title: "Create a Wallet",
-      description: "Download metamask or your wallet of choice from the app store or google play store for free. Desktop users, download the google chrome extension by going to metamask.io.",
+      description: "Download Phantom or your wallet of choice from the app store or google play store for free. Desktop users, download the google chrome extension by going to phantom.app.",
     },
     {
-      title: "Get Some ETH",
-      description: "Have ETH in your wallet to switch to $MEME. If you don't have any ETH, you can buy directly on metamask, transfer from another wallet, or buy on another exchange and send it to your wallet.",
+      title: "Get Some SOL",
+      description: "Have SOL in your wallet to switch to $UFO. If you don't have any SOL, you can buy directly on Phantom, transfer from another wallet, or buy on another exchange and send it to your wallet.",
     },
     {
-      title: "Go to Uniswap",
-      description: "Connect to Uniswap. Go to app.uniswap.org in google chrome or on the browser inside your Metamask app. Connect your wallet. Paste the $MEME token address into Uniswap, select MEME, and confirm. When Metamask prompts you for a wallet signature, sign.",
+      title: "Go to Jupiter",
+      description: "Connect to Jupiter. Go to jup.ag in google chrome or on the browser inside your Phantom app. Connect your wallet. Paste the $UFO token address into Jupiter, select UFO, and confirm. When Phantom prompts you for a wallet signature, sign.",
     },
     {
-      title: "Switch ETH for $MEME",
-      description: "Switch ETH for $MEME. We have ZERO taxes so you don't need to worry about buying with a specific slippage, although you may need to use slippage during times of market volatility.",
+      title: "Switch SOL for $UFO",
+      description: "Switch SOL for $UFO. We have ZERO taxes so you don't need to worry about buying with a specific slippage, although you may need to use slippage during times of market volatility.",
     },
   ];
 
