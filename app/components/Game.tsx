@@ -516,72 +516,76 @@ const Game = () => {
       return true;
     });
 
-    // Draw player (rocket) with enhanced graphics
+    // Draw player (UFO) with enhanced graphics
     ctx.save();
     ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
     
-    // Rocket glow
-    const rocketGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, player.width);
-    rocketGlow.addColorStop(0, "rgba(0, 255, 136, 0.3)");
-    rocketGlow.addColorStop(1, "rgba(0, 255, 136, 0)");
-    ctx.fillStyle = rocketGlow;
+    // UFO glow
+    const ufoGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, player.width);
+    ufoGlow.addColorStop(0, "rgba(0, 255, 136, 0.3)");
+    ufoGlow.addColorStop(1, "rgba(0, 255, 136, 0)");
+    ctx.fillStyle = ufoGlow;
     ctx.beginPath();
     ctx.arc(0, 0, player.width, 0, Math.PI * 2);
     ctx.fill();
     
-    // Rocket body with gradient
-    const rocketGradient = ctx.createLinearGradient(0, -player.height / 2, 0, player.height / 2);
-    rocketGradient.addColorStop(0, "#00ff88");
-    rocketGradient.addColorStop(1, "#00cc6a");
-    ctx.fillStyle = rocketGradient;
+    // UFO saucer body (bottom part - flattened ellipse)
+    const saucerGradient = ctx.createLinearGradient(0, -5, 0, 15);
+    saucerGradient.addColorStop(0, "#00ff88");
+    saucerGradient.addColorStop(0.5, "#00cc6a");
+    saucerGradient.addColorStop(1, "#008855");
+    ctx.fillStyle = saucerGradient;
     ctx.beginPath();
-    ctx.moveTo(0, -player.height / 2);
-    ctx.lineTo(-player.width / 4, player.height / 2);
-    ctx.lineTo(player.width / 4, player.height / 2);
-    ctx.closePath();
+    ctx.ellipse(0, 8, player.width / 2, player.height / 3, 0, 0, Math.PI * 2);
     ctx.fill();
     
-    // Rocket border
+    // UFO saucer border
     ctx.strokeStyle = "#00d4ff";
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Rocket window with shine
-    const windowGradient = ctx.createRadialGradient(-3, -13, 0, 0, -10, 8);
-    windowGradient.addColorStop(0, "#00d4ff");
-    windowGradient.addColorStop(1, "#0088cc");
-    ctx.fillStyle = windowGradient;
+    
+    // UFO dome (top part)
+    const domeGradient = ctx.createRadialGradient(0, -8, 0, 0, -8, player.width / 2.5);
+    domeGradient.addColorStop(0, "#00d4ff");
+    domeGradient.addColorStop(0.6, "#00aacc");
+    domeGradient.addColorStop(1, "#0088aa");
+    ctx.fillStyle = domeGradient;
     ctx.beginPath();
-    ctx.arc(0, -10, 8, 0, Math.PI * 2);
+    ctx.ellipse(0, -8, player.width / 2.5, player.height / 3, 0, 0, Math.PI * 2);
     ctx.fill();
     
-    // Window highlight
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    // Dome highlight/shine
+    ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
     ctx.beginPath();
-    ctx.arc(-3, -13, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Rocket flame with animation
-    const flameSize = 15 + Math.sin(Date.now() * 0.01) * 3;
-    const flameGradient = ctx.createLinearGradient(0, player.height / 2, 0, player.height / 2 + flameSize);
-    flameGradient.addColorStop(0, "#ff6b00");
-    flameGradient.addColorStop(0.5, "#ffaa00");
-    flameGradient.addColorStop(1, "#ffff00");
-    ctx.fillStyle = flameGradient;
-    ctx.beginPath();
-    ctx.moveTo(-player.width / 6, player.height / 2);
-    ctx.lineTo(0, player.height / 2 + flameSize);
-    ctx.lineTo(player.width / 6, player.height / 2);
-    ctx.closePath();
+    ctx.ellipse(-5, -12, player.width / 6, player.height / 6, 0, 0, Math.PI * 2);
     ctx.fill();
     
-    // Inner flame
-    ctx.fillStyle = "#ffff00";
+    // UFO lights around the edge (animated)
+    const ufoTime = Date.now() * 0.005;
+    const lightColors = ["#00ff88", "#00d4ff", "#ff00ff", "#ffff00"];
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + ufoTime;
+      const lightX = Math.cos(angle) * (player.width / 2 - 5);
+      const lightY = Math.sin(angle) * (player.height / 3 - 5) + 8;
+      const lightIndex = Math.floor((i + ufoTime * 2) % lightColors.length);
+      const lightAlpha = 0.5 + Math.sin(ufoTime * 3 + i) * 0.5;
+      
+      ctx.fillStyle = lightColors[lightIndex];
+      ctx.globalAlpha = lightAlpha;
+      ctx.beginPath();
+      ctx.arc(lightX, lightY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    
+    // Center light/beam (optional pulsing effect)
+    const beamPulse = 0.7 + Math.sin(Date.now() * 0.01) * 0.3;
+    const beamGradient = ctx.createRadialGradient(0, 8, 0, 0, 8, 8);
+    beamGradient.addColorStop(0, `rgba(0, 255, 136, ${beamPulse * 0.3})`);
+    beamGradient.addColorStop(1, "rgba(0, 255, 136, 0)");
+    ctx.fillStyle = beamGradient;
     ctx.beginPath();
-    ctx.moveTo(-player.width / 8, player.height / 2);
-    ctx.lineTo(0, player.height / 2 + flameSize * 0.7);
-    ctx.lineTo(player.width / 8, player.height / 2);
-    ctx.closePath();
+    ctx.arc(0, 8, 8, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
@@ -707,7 +711,7 @@ const Game = () => {
             Collect The Coins!
           </h2>
           <p className="text-white/70 text-lg mb-6">
-            Move your mouse or drag your finger to control the rocket. Collect coins and avoid obstacles!
+            Move your mouse or drag your finger to control the UFO. Collect coins and avoid obstacles!
           </p>
         </motion.div>
 
